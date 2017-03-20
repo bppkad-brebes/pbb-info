@@ -27,7 +27,39 @@
         </style>
 
         <paper-drawer-panel left-drawer class="flex">
-            
+            <stats-panel drawer></stats-panel>
+            <paper-header-panel main>
+                <paper-toolbar class="toolbar">
+                    <h1>Informasi PBB-P2 Kabupaten Brebes</h1>
+                    <span class="flex"></span>
+                </paper-toolbar>
+            </paper-header-panel>
         </paper-drawer-panel>
+
+        <form-pbb-info id="formPbbInfo"></form-pbb-info>
+
+        <paper-toast id="toast"></paper-toast>
     </template>
+    <script>
+        Polymer({
+            is: 'pbb-info-app',
+
+            properties: {
+                nop: String,
+                thn: String
+            },
+
+            behaviors: [Polymer.NeonAnimatableBehavior],
+
+            listeners: {
+                'entry-pbb-info': '_entryPbbInfo'
+            },
+
+            _entryPbbInfo: function() {
+                this.$.formPbbInfo.open();
+            },
+
+
+        });
+    </script>
 </dom-module>

@@ -1,0 +1,41 @@
+<link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="bower_components/paper-item/paper-item.html">
+<link rel="import" href="scripts/moment-js.html">
+
+<dom-module id="stats-panel">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                flex-direction: column;
+                background: var(--light-primary-color);
+            }
+
+            .toolbar {
+                display: flex;
+                flex-direction: row-reverse;
+                border: none;
+            }
+
+            .container {
+                flex: 1;
+            }
+        </style>
+
+        <paper-menu>
+            <paper-item on-tap="_showInformasiNop">INFO NOP</paper-item>
+        </paper-menu>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'stats-panel',
+
+            _showInformasiNop: function() {
+                this.fire('form-pbb-info', {});
+            }
+        });
+    </script>
+</dom-module>
