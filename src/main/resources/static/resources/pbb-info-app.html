@@ -8,6 +8,7 @@
 <link rel="import" href="bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="stats-panel.html">
 <link rel="import" href="form-pbb-info.html">
+<link rel="import" href="info-pbb-ajax.html">
 
 <dom-module id="pbb-info-app">
     <template>
@@ -26,6 +27,9 @@
             }
         </style>
 
+        <info-pbb-ajax id="infoPbbAjax" url="/api/getInfoPbb" nop="{{nop}}" thn="{{thn}}"
+                       last-response="{{dataPbb}}"></info-pbb-ajax>
+
         <paper-drawer-panel left-drawer class="flex">
             <stats-panel drawer></stats-panel>
             <paper-header-panel main>
@@ -33,9 +37,10 @@
                     <h1>Informasi PBB-P2 Kabupaten Brebes</h1>
                     <span class="flex"></span>
                 </paper-toolbar>
+
+                <pbb-info id="pbbInfo" class="fit" dataPbb="[[dataPbb]]"></pbb-info>
             </paper-header-panel>
         </paper-drawer-panel>
-
         <form-pbb-info id="formPbbInfo"></form-pbb-info>
 
         <paper-toast id="toast"></paper-toast>
@@ -45,19 +50,35 @@
             is: 'pbb-info-app',
 
             properties: {
-                nop: String,
-                thn: String
+                nop: {
+                    type: String,
+                    value: ''
+                },
+                thn: {
+                    type: String,
+                    value: ''
+                }
+                dataPbb: {
+                    type: Object
+                }
             },
 
             behaviors: [Polymer.NeonAnimatableBehavior],
 
             listeners: {
-                'entry-pbb-info': '_entryPbbInfo'
+                'entry-pbb-info': '_entryPbbInfo',
+                'data-info-pbb-updated': '_dataInfoPbbUpdated'
             },
 
             _entryPbbInfo: function() {
                 this.$.formPbbInfo.open();
             },
+
+            _dataInfoPbbUpdated: function(evt) {
+                var toast = this.$.toast;
+                toast.text = evt.detail.message;
+                toast.show();
+            }
 
 
         });

@@ -3,8 +3,8 @@
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/iron-form/iron-form.html">
 <link rel="import" href="bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="scripts/moment-js.html">
-<link rel="import" href="info-pbb-ajax.html">
 
 <dom-module id="form-pbb-info">
     <template>
@@ -85,7 +85,8 @@
             }
         </style>
 
-        <info-pbb-ajax id="infoPbbAjax" url="/api/getInfoPbb" nop="{{nop}}"></info-pbb-ajax>
+        <info-pbb-ajax id="infoPbbAjax" url="/api/getInfoPbb" nop="{{nop}}" handle-as="json"
+                last-response="{{dataPbb}}"></info-pbb-ajax>
 
         <paper-dialog id="dialog" modal>
             <div class="main-layout">
@@ -97,7 +98,7 @@
 
             <div class="form">
                 <form is="iron-form" id="form">
-                    <iron-a11y-keys keys="enter" on-key-pressed="_gotoThn"></iron-a11y-keys>
+                    <iron-a11y-keys keys="enter" on-key-pressed="_prosesNop"></iron-a11y-keys>
                     <paper-input name="nop" value="{{nop}}" id="nop" label="NOP"
                                  required autofocus error-message="NOP perlu diisi dengan tanpa menggunakan tanda baca"></paper-input>
                     <paper-input name="thn" value="{{thn}}" id="thn" label="TAHUN"
@@ -112,4 +113,89 @@
             <span class="error-message" hidden="[[!errorMessage]]">[[errorMessage]]</span>
         </paper-dialog>
     </template>
+
+    <script>
+        (function() {
+            'use strict',
+
+            Polymer({
+                is: 'form-pbb-info',
+
+                properties: {
+                    nop: {
+                        type: String,
+                        value: ''
+                    },
+                    thn: {
+                        type: String,
+                        value: ''
+                    },
+                    errorMessage: String,
+                    handleResponse: {
+                        type: Object,
+                        notify: true
+                    }
+                },
+
+                close: function() {
+                    this.$.dialog.close();
+                },
+
+                open: function() {
+                    this.$.dialog.open();
+                },
+
+                _prosesNop: function() {
+                    var _this = this;
+                    this.errorMessage = '';
+                    var form = this.$.form;
+
+                    if(form.validate()) {
+                        var informasiNop = form.serialize();
+                        this._ajax({
+                            url: '/api/pbb',
+                            method: 'POST',
+                            body: informasiNop
+                        }).then(function() {
+                            _this.fire('data-info-pbb-updated', {message: 'Data ditemukan'});
+                            _this.close();
+                        }).catch(function(err) {
+                            console.log(err);
+                            _this.errorMessage = 'Gagal Ambil Data.';
+                        });
+                    }
+                },
+
+                _ajax: function(options) {
+                    var _this = this;
+                    var method = options.method;
+                    var url = options.url;
+
+                    return new Promise(function(resolve,  reject) {
+                        var xhr = new XMLHttpRequest();
+                        xhr.onreadystatechange = function() {
+                            if(xhr.readyState === 4) {
+                                if(xhr.status >= 200 && xhr.status < 300) {
+                                    if(xhr.responseText) {
+                                        resolve(JSON.parse(xhr.responseText));
+                                    } else {
+                                        resolve();
+                                    }
+                                } else {
+                                    reject({
+                                        sucess: false,
+                                        status: xhr.status
+                                    });
+                                }
+                            }
+                        };
+
+                        xhr.open(method, url, true);
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+                        xhr.send(JSON.stringify(options.body));
+                    });
+                }
+            });
+        })();
+    </script>
 </dom-module>
